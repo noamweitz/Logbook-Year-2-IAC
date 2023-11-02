@@ -104,4 +104,4 @@ For this we introduce an offset. We have to introduce it as an input in the sine
 
 #### Task 3
 
-All done, look at code I wrote. Fairly straightforward !!# Log-Book-Year-2-IAC
+All done, look at code I wrote. Fairly straightforward.
