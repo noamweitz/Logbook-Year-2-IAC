@@ -105,3 +105,6 @@ For this we introduce an offset. We have to introduce it as an input in the sine
 #### Task 3
 
 All done, look at code I wrote. Fairly straightforward.
+
+
+## Lab 3
