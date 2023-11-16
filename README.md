@@ -88,13 +88,13 @@ For the second step, we create the sinegen.sv top-level module, which includes t
 
 ![including modules](/Images/including%20modules%20in%20the%20toplevel%20module.png)
 
-This is extremely important. We plug into the inner module th values of input that exit in te top-level module.
+This is extremely important. We plug into the inner module the values of input that exit in the top-level module.
 
-We also have to update the doit.sh file so that it compiles all the useful sv files and uses the testbench to execute the top level one. We also create the new files in the directory.
+We also have to update the doit.sh file so that it compiles all the useful sv files and uses the correct testbench to execute the top level one. We also create the new files in the directory.
 
 For writing the test bench, we have to adapt it to the sinegen.sv file. Look at how it is done, extremely important. 
 
-For the challenge, we use the vbdValue() function to change the frequency of the sinewave generator. For this we implement the value of incr using the vbdValue()
+For the challenge, we use the vbdValue() function to change the frequency of the sinewave generator. For this we implement the value of incr using the vbdValue().
 
 #### Task 2
 
@@ -107,4 +107,96 @@ For this we introduce an offset. We have to introduce it as an input in the sine
 All done, look at code I wrote. Fairly straightforward.
 
 
-## Lab 3
+## Lab 3: Finite State Machines
+
+#### Task 1
+
+For task 1, we have to write code for a linear feedback shift register (LFSR). This requires us to create the lfsr.sv file and the testbench (lfsr_tb.cpp)and the doit.sh file to run compile and execute our code. 
+
+BEWARE: Do not forget to have an initial reset because else we are always at 0 and whatever the mathematical operation we do, we will stay at 0. 
+```SV
+module lfsr4 #(
+    parameter WIDTH = 4
+) (
+    input logic clk,
+    input logic rst,
+    input logic en,
+    output logic [WIDTH-1:0] data_out
+);
+
+logic [WIDTH-1:0] sreg;
+
+always_ff @(posedge clk, posedge rst)
+    if(rst)
+        sreg <= 4'b1;
+    else if(en)    
+        sreg <= {sreg[2:0], sreg[3] ^ sreg[2]};
+
+assign data_out = sreg;    
+
+endmodule
+```
+
+For the challenge part, we had to modify our code to make it a 7-bit Pseudo Random Binary Sequence (PRBS). For this, in the sv file we just change size of parameter. We also have to modify the testbench.
+```cpp
+    vbdHex(1, top->data_out & 0xF);
+    vbdHex(2, top->data_out >> 4 & 0xF);
+    vbdBar(top->data_out & 0xFF);
+```
+
+
+#### Task 2
+
+This task wants us to write the Finite State Machine module for the formula 1 light sequence and the testbench file to test it.
+
+In the sv file for the FSM, we include operations to specifu the next state based on the current state and the output based on the current state. We also include an enumeration fo all the possible steates for our FSM: 
+```SV
+module f1_fsm #(
+    parameter WIDTH = 8
+)(
+    input logic clk,
+    input logic rst,
+    input logic en,
+    output logic [WIDTH-1:0] data_out
+);
+
+typedef enum {S0, S1, S2, S3, S4, S5, S6, S7, S8} my_state;
+my_state current_state, next_state;
+
+// state transition
+always_ff @(posedge clk, posedge rst)
+    if (rst)
+        current_state <= S0;
+    else if (en)
+        current_state <= next_state;
+
+// next state logic
+always_comb
+    case(current_state)
+        S0: next_state = S1;
+        S1: next_state = S2;
+        S2: next_state = S3;
+        S3: next_state = S4;
+        S4: next_state = S5;
+        S5: next_state = S6;
+        S6: next_state = S7;
+        S7: next_state = S8;
+        S8: next_state = S0;
+    endcase
+
+//output logic
+always_comb
+    case (current_state)
+        S0: data_out = 8'b0;
+        S1: data_out = 8'b1;
+        S2: data_out = 8'b11;
+        S3: data_out = 8'b111;
+        S4: data_out = 8'b1111;
+        S5: data_out = 8'b11111;
+        S6: data_out = 8'b111111;
+        S7: data_out = 8'b1111111;
+        S8: data_out = 8'b11111111;
+    endcase
+
+endmodule
+```
