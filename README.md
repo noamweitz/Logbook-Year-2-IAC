@@ -200,3 +200,18 @@ always_comb
 
 endmodule
 ```
+
+For our testbench, we just use this line to display the result (turn the light on). the rest of the testbench is very similar to the once for previous task: 
+```cpp
+vbdBar(top->data_out & 0xFF);
+```
+
+#### Task 3
+
+Task 3 asks us to use the clcktick.sv file introduced in lectures to synchronise the circuit under simulation to a 1s tick period. 
+For my laptop, N is around 25 (value of the rotary encoder displayed on the TFT display)
+
+For the challenge part, we want the F1 light sequence to cycle throuhg automatically with 1 second delay per transition state. 
+
+![](images/f1_sequence.jpg)
+
